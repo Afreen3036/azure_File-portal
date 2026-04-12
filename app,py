@@ -1,0 +1,35 @@
+import os
+from flask import Flask, render_template, request, redirect
+from azure.identity import DefaultAzureCredential
+from azure.storage.blob import BlobServiceClient
+
+app = Flask(__name__)
+
+# This will pull your storage name from Azure settings later
+ACCOUNT_NAME = os.getenv('STORAGE_ACCOUNT_NAME', 'STORAGE_ACCOUNT_NAME')
+ACCOUNT_URL = f"https://{ACCOUNT_NAME}.blob.core.windows.net"
+CONTAINER_NAME = "FILE_UPLOAD"
+
+# Security: Managed Identity (No keys in code!)
+credential = DefaultAzureCredential()
+blob_service_client = BlobServiceClient(ACCOUNT_URL, credential=credential)
+
+@app.route('/')
+def index():
+    container_client = blob_service_client.get_container_client(CONTAINER_NAME)
+    # List all files in storage
+    blobs = container_client.list_blobs()
+    return render_template('index.html', blobs=blobs)
+
+@app.route('/upload', methods=['POST'])
+def upload():
+    file = request.files['file']
+    if file:
+        blob_client = blob_service_client.get_blob_client(container=CONTAINER_NAME, blob=file.filename)
+        blob_client.upload_blob(file.read(), overwrite=True)
+    return redirect('/')
+
+if __name__ == '__main__':
+    app.run()
+
+    
