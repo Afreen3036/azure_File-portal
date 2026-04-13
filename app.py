@@ -28,6 +28,29 @@ def upload():
         blob_client = blob_service_client.get_blob_client(container=CONTAINER_NAME, blob=file.filename)
         blob_client.upload_blob(file.read(), overwrite=True)
     return redirect('/')
+@app.route('/download/<blob_name>')
+def download_file(blob_name):
+    # Generates a secure temporary link valid for 1 hour
+    blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob_name)
+    
+    sas_token = generate_blob_sas(
+        account_name=account_name,
+        container_name=container_name,
+        blob_name=blob_name,
+        account_key=None, 
+        user_delegation_key=blob_service_client.get_user_delegation_key(datetime.utcnow(), datetime.utcnow() + timedelta(hours=1)),
+        permission=BlobSasPermissions(read=True),
+        expiry=datetime.utcnow() + timedelta(hours=1)
+    )
+    
+    download_url = f"{blob_client.url}?{sas_token}"
+    return redirect(download_url)
+
+@app.route('/delete/<blob_name>')
+def delete_file(blob_name):
+    blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob_name)
+    blob_client.delete_blob()
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run()
