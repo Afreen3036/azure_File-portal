@@ -29,12 +29,6 @@ def upload():
         blob_client = blob_service_client.get_blob_client(container=CONTAINER_NAME, blob=file.filename)
         blob_client.upload_blob(file.read(), overwrite=True)
     return redirect('/')
-import os
-from flask import Flask, render_template, request, redirect, url_for
-from azure.storage.blob import BlobServiceClient, generate_blob_sas, BlobSasPermissions
-from datetime import datetime, timedelta
-
-# ... (Your existing BlobServiceClient and variable definitions) ...
 
 @app.route('/download/<blob_name>')
 def download_file(blob_name):
