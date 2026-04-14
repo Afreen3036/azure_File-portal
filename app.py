@@ -6,9 +6,9 @@ from azure.storage.blob import BlobServiceClient
 app = Flask(__name__)
 
 # This will pull your storage name from Azure settings later
-ACCOUNT_NAME = os.getenv('STORAGE_ACCOUNT_NAME')
+ACCOUNT_NAME = os.getenv('STORAGE_ACCOUNT_NAME', 'STORAGE_ACCOUNT_NAME')
 ACCOUNT_URL = f"https://{ACCOUNT_NAME}.blob.core.windows.net"
-CONTAINER_NAME = "uploads"
+CONTAINER_NAME = "FILE_UPLOAD"
 
 # Security: Managed Identity (No keys in code!)
 credential = DefaultAzureCredential()
