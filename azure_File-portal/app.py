@@ -44,7 +44,6 @@ def upload():
         blob_client.upload_blob(file.read(), overwrite=True)
     return redirect('/')
 
-
 @app.route("/download/<path:blob_name>")
 def download_file(blob_name):
     blob_client = blob_service_client.get_blob_client(
@@ -70,7 +69,6 @@ def download_file(blob_name):
         as_attachment=True,
         download_name=os.path.basename(blob_name) or blob_name,
     )
-
 
 @app.route("/delete/<path:blob_name>")
 def delete_file(blob_name):
